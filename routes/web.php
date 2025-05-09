@@ -12,3 +12,12 @@ use App\Http\Controllers\API\ReviewController;
 // Neue verschachtelte Routen für Reviews
 Route::apiResource('books.reviews', ReviewController::class);
 
+Route::apiResource('books', BookController::class);
+
+Route::apiResource('authors', AuthorController::class);
+
+Route::apiResource('categories', CategoryController::class);
+
+Route::get('/test', function () {
+    return response()->json(['message' => 'Wingapo World!']);
+});

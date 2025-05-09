@@ -15,7 +15,6 @@ return new class extends Migration
             $table->id();
             $table->string('title');
             $table->string('description')->nullable();
-            $table->string('cover')->nullable();
             $table->unsignedInteger('author_id');
             $table->unsignedInteger('category_id');
             $table->decimal('price', 8, 2);

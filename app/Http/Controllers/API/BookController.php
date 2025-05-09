@@ -11,15 +11,19 @@ class BookController extends Controller
     /**
      * Display a listing of the resource.
      */
-    // In app/Http/Controllers/API/BookController.php
-// Die index-Methode ändern:
 
     public function index(Request $request)
     {
-        $query = Book::with(['author', 'category']);
+        $books = Book::with(['author', 'category'])->get();
+
+        // Add filter function
+        // $query = Book::query();
+
+        // Alle Bücher mit Autor und Kategorie laden
+       // $query = Book::with(['author', 'category']);
 
         // Nach Kategorie filtern
-        if ($request->has('category_id')) {
+        /*if ($request->has('category_id')) {
             $query->where('category_id', $request->category_id);
         }
 
@@ -67,8 +71,7 @@ class BookController extends Controller
         // Durchschnittsbewertung hinzufügen
         $books->each(function ($book) {
             $book->average_rating = $book->averageRating();
-        });
-
+        });*/
         return response()->json($books);
     }
 
@@ -78,30 +81,58 @@ class BookController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'author_id' => 'required|exists:authors,id',
+            'category_id' => 'required|exists:categories,id',
+            'price' => 'required|numeric|min:0',
+            'published_year' => 'nullable|integer',
+            'stock' => 'required|integer|min:0',
+        ]);
+
+        $book = Book::create($request->all());
+
+        return response()->json($book, 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(Book $book)
     {
-        //
+        //$book->load(['author', 'category', 'reviews.user']);
+        //$book->average_rating = $book->averageRating();
+
+        //return response()->json($book)
+
+        return response()->json($book)->load(['author', 'category']);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Book $book)
     {
-        //
+        $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'author_id' => 'required|exists:authors,id',
+            'category_id' => 'required|exists:categories,id',
+            'price' => 'required|numeric|min:0',
+            'published_year' => 'required|integer',
+            'stock' => 'required|integer|min:0',
+        ]);
+        $book->update($request->all());
+        return response()->json($book);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Book $book)
     {
-        //
+        $book->delete();
+        return response()->json(null, 204);
     }
 }
